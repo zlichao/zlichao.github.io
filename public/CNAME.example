@@ -1,0 +1,7 @@
+# 如果你要用自定义域名：
+# 1. 把这个文件改名为 CNAME（无扩展名）
+# 2. 文件内容只写一行你的域名，例如：example.com
+# 3. 在域名 DNS 里配置 CNAME 指向 <用户名>.github.io
+# 4. 同步修改 astro.config.mjs 的 site，并删掉 base
+
+example.com

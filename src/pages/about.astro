@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于本站" description="Astro + GitHub Pages 模板的关于页">
+  <h1>关于本站</h1>
+  <p>这个页面用来演示多页面路由。每个 <code>.astro</code> 文件都会被构建成独立的 HTML 页面。</p>
+
+  <h2>目录结构</h2>
+  <pre><code>src/
+  components/  可复用组件（含 React island）
+  layouts/     共享页面布局
+  pages/       路由页面
+public/        原样拷贝到站点根目录的静态文件
+.github/workflows/deploy.yml  自动部署脚本</code></pre>
+
+  <p><a href={import.meta.env.BASE_URL}>← 返回首页</a></p>
+</BaseLayout>
+
+<style>
+  pre {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  code { font-family: ui-monospace, monospace; font-size: 0.9rem; }
+  a { color: #58a6ff; }
+</style>

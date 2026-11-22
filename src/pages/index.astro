@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Counter from '../components/Counter.jsx';
+---
+
+<BaseLayout title="Astro + GitHub Pages 模板">
+  <h1>🥟 Astro + GitHub Pages</h1>
+  <p>
+    这是你的最小可运行模板。页面本身是构建时生成的纯 HTML，
+    零 JavaScript —— 除了下面这块 React island。
+  </p>
+
+  <Counter client:load />
+
+  <h2>为什么选 Astro？</h2>
+  <ul>
+    <li><strong>默认零 JS</strong>：内容站只发 HTML，首屏飞快</li>
+    <li><strong>Islands 架构</strong>：哪块要交互才给哪块注水</li>
+    <li><strong>官方 Action</strong>：push 到 main 自动构建发布</li>
+    <li><strong>不锁生态</strong>：React / Vue / Svelte 组件都能混用</li>
+  </ul>
+
+  <h2>下一步</h2>
+  <ol>
+    <li>把 <code>astro.config.mjs</code> 里的 site / base 改成你的</li>
+    <li>本地 <code>npm run dev</code> 预览，<code>npm run build</code> 构建</li>
+    <li>推到 GitHub，在 Settings → Pages 里 Source 选 GitHub Actions</li>
+  </ol>
+</BaseLayout>
+
+<style>
+  h2 { margin-top: 2.5rem; font-size: 1.35rem; }
+  li { margin: 0.5rem 0; line-height: 1.6; }
+  code {
+    background: #21262d;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  :global(.counter) {
+    margin: 1.75rem 0;
+    padding: 1.25rem;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    background: #161b22;
+  }
+  :global(.counter p) { margin: 0 0 1rem; color: #8b949e; font-size: 0.9rem; }
+  :global(.counter button) {
+    background: #238636;
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 0.6rem 1.1rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  :global(.counter button:hover) { background: #2ea043; }
+</style>
