@@ -1,31 +1,117 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const timeline = [
+  { year: '2020', title: '第一行代码', desc: '在 GitHub 上建了第一个仓库，从 Hello World 开始，懵懂但兴奋。' },
+  { year: '至今', title: '持续构建中', desc: '从后端到全栈，从写业务到懂架构。踩过的坑都变成了笔记，走过的路都成了成长。' },
+  { year: '未来', title: '保持好奇', desc: '想做点真正有用的东西，写好每一行代码，也写好每一篇分享。' },
+];
+
+const contacts = [
+  { label: 'GitHub', value: 'github.com/zlichao', href: 'https://github.com/zlichao' },
+  { label: 'Email', value: 'zlichao0910@gmail.com', href: 'mailto:zlichao0910@gmail.com' },
+];
 ---
 
-<BaseLayout title="关于本站" description="Astro + GitHub Pages 模板的关于页">
-  <h1>关于本站</h1>
-  <p>这个页面用来演示多页面路由。每个 <code>.astro</code> 文件都会被构建成独立的 HTML 页面。</p>
+<BaseLayout title="关于我 — Kevin Zhao" description="关于 Kevin Zhao：后端/全栈开发者，持续学习与分享">
 
-  <h2>目录结构</h2>
-  <pre><code>src/
-  components/  可复用组件（含 React island）
-  layouts/     共享页面布局
-  pages/       路由页面
-public/        原样拷贝到站点根目录的静态文件
-.github/workflows/deploy.yml  自动部署脚本</code></pre>
+  <div class="page-head">
+    <div class="cmd"><span class="prompt">❯</span> cat ./about.md</div>
+    <h1>关于我</h1>
+  </div>
 
-  <p><a href={import.meta.env.BASE_URL}>← 返回首页</a></p>
+  <div class="card intro">
+    <div class="line"><span class="green">name</span>: Kevin Zhao</div>
+    <div class="line"><span class="green">role</span>: 后端 / 全栈开发工程师</div>
+    <div class="line"><span class="green">focus</span>: 服务端架构 · 系统设计 · 工程效率</div>
+    <div class="line"><span class="green">motto</span>: <span class="amber">"保持好奇，持续构建。"</span></div>
+  </div>
+
+  <p class="bio">
+    你好，我是 Kevin。一个喜欢把复杂问题拆清楚的工程师。
+    我相信写代码的本质是把思维变成现实，而写笔记是把混乱的思维理清楚。
+    这个站点就是我的「第二大脑」——记录学到的、踩过的、想明白的。
+  </p>
+
+  <section class="section">
+    <div class="section-title"><span class="green">$</span> cat ./timeline.log <span class="line"></span></div>
+    <div class="timeline">
+      {timeline.map((item) => (
+        <div class="tl-item">
+          <div class="tl-year">{item.year}</div>
+          <div class="tl-content">
+            <div class="tl-title">{item.title}</div>
+            <div class="tl-desc dim">{item.desc}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="green">$</span> cat ./contact.json <span class="line"></span></div>
+    <div class="contacts">
+      {contacts.map((c) => (
+        <a class="contact" href={c.href} target="_blank" rel="noopener">
+          <span class="contact-label dim">{c.label}</span>
+          <span class="contact-value">{c.value}</span>
+          <span class="contact-arrow dim">↗</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="hint dim">
+    <span class="green">//</span> 提示：这里的个人信息都是占位内容，改成你自己的就行。
+  </div>
+
 </BaseLayout>
 
 <style>
-  pre {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 1.25rem;
-    overflow-x: auto;
-    line-height: 1.6;
+  .page-head { margin-bottom: 1.8rem; }
+  .cmd { color: var(--dim); font-size: 0.82rem; margin-bottom: 1rem; }
+  .prompt { color: var(--green); }
+  h1 { font-size: 2rem; margin: 0; }
+  .green { color: var(--green); }
+  .amber { color: var(--amber); }
+
+  .card { border: 1px solid var(--border); border-radius: 10px; background: rgba(17,25,37,0.6); padding: 1.4rem 1.6rem; }
+  .line { font-size: 0.85rem; padding: 0.35rem 0; }
+  .bio { line-height: 1.9; font-size: 0.9rem; color: var(--dim); margin: 1.5rem 0 0; }
+
+  .section { margin-top: 3rem; }
+  .section-title { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 1.3rem; }
+  .section-title .line { flex: 1; height: 1px; background: var(--border); margin-left: 0.5rem; }
+
+  .timeline { border-left: 1px solid var(--border); padding-left: 1.5rem; margin-left: 0.5rem; }
+  .tl-item { position: relative; padding-bottom: 1.8rem; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.85rem; top: 0.3rem;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px rgba(57,255,158,0.5);
   }
-  code { font-family: ui-monospace, monospace; font-size: 0.9rem; }
-  a { color: #58a6ff; }
+  .tl-year { font-size: 0.72rem; color: var(--cyan); margin-bottom: 0.4rem; }
+  .tl-title { color: var(--fg-bright); font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .tl-desc { font-size: 0.8rem; line-height: 1.7; }
+
+  .contacts { display: grid; gap: 0.7rem; }
+  .contact {
+    display: flex; align-items: center; gap: 1rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+    background: rgba(17,25,37,0.5);
+  }
+  .contact:hover { border-color: var(--green); transform: translateX(3px); }
+  .contact-label { font-size: 0.75rem; width: 70px; }
+  .contact-value { color: var(--fg-bright); font-size: 0.85rem; }
+  .contact:hover .contact-value { color: var(--green); }
+  .contact-arrow { margin-left: auto; }
+
+  .hint { font-size: 0.72rem; margin-top: 3rem; padding: 0.8rem 1rem; border: 1px dashed var(--border); border-radius: 6px; }
 </style>

@@ -1,0 +1,122 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((note) => ({
+    params: { id: note.id },
+    props: { note },
+  }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={`${note.data.title} — Kevin Zhao`} description={note.data.description}>
+
+  <a class="back dim" href={`${import.meta.env.BASE_URL}notes/`}>← cd ../notes</a>
+
+  <article>
+    <header>
+      <div class="meta">
+        <span class="category">{note.data.category}</span>
+        <time class="dim" datetime={note.data.date.toISOString()}>{fmtDate(note.data.date)}</time>
+      </div>
+      <h1>{note.data.title}</h1>
+      <p class="desc dim">{note.data.description}</p>
+      <div class="tags">
+        {note.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
+      </div>
+    </header>
+
+    <div class="divider"><span class="green">❯</span> cat ./content.md</div>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <div class="end">
+    <div class="end-line"></div>
+    <p class="dim">// EOF — 感谢阅读，欢迎交流</p>
+    <a class="btn" href={`${import.meta.env.BASE_URL}notes/`}>← 返回笔记列表</a>
+  </div>
+
+</BaseLayout>
+
+<style is:global>
+  .back { font-size: 0.78rem; text-decoration: none; }
+  .back:hover { color: var(--green); }
+
+  article { margin-top: 2rem; }
+  .meta { display: flex; align-items: center; gap: 0.9rem; font-size: 0.72rem; margin-bottom: 1rem; }
+  .category { color: var(--purple); border: 1px solid rgba(183,140,255,0.3); padding: 0.2rem 0.55rem; border-radius: 4px; }
+  article h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); margin: 0 0 0.8rem; line-height: 1.3; }
+  .desc { font-size: 0.9rem; line-height: 1.7; margin: 0 0 1rem; }
+  .tags { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .green { color: var(--green); }
+  .tag { font-size: 0.7rem; color: var(--cyan); opacity: 0.85; border: 1px solid rgba(77,216,255,0.2); padding: 0.2rem 0.5rem; border-radius: 4px; }
+
+  .divider { font-family: var(--mono); font-size: 0.82rem; color: var(--dim); margin: 2.5rem 0 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+
+  .prose { font-size: 0.92rem; line-height: 1.9; color: var(--fg); }
+  .prose h2 {
+    font-size: 1.3rem; color: var(--green); margin: 2.2rem 0 1rem;
+    padding-left: 0.8rem; border-left: 3px solid var(--green);
+  }
+  .prose h3 { font-size: 1.1rem; color: var(--cyan); margin: 1.8rem 0 0.8rem; }
+  .prose p { margin: 0 0 1.2rem; }
+  .prose strong { color: var(--fg-bright); }
+  .prose a { color: var(--cyan); text-underline-offset: 3px; }
+  .prose ul, .prose ol { padding-left: 1.4rem; margin: 0 0 1.2rem; }
+  .prose li { margin: 0.45rem 0; }
+  .prose li::marker { color: var(--green); }
+  .prose code {
+    font-family: var(--mono);
+    background: rgba(57,255,158,0.08);
+    color: var(--amber);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  .prose pre {
+    background: #070b11;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 1.2rem 1.3rem;
+    overflow-x: auto;
+    margin: 1.4rem 0;
+    line-height: 1.7;
+  }
+  .prose pre code { background: none; color: var(--fg); padding: 0; font-size: 0.82rem; }
+  .prose blockquote {
+    border-left: 3px solid var(--purple);
+    margin: 1.5rem 0;
+    padding: 0.5rem 0 0.5rem 1.2rem;
+    color: var(--dim);
+    background: rgba(183,140,255,0.04);
+  }
+  .prose table { width: 100%; border-collapse: collapse; margin: 1.4rem 0; font-size: 0.85rem; }
+  .prose th, .prose td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; }
+  .prose th { background: var(--bg-soft); color: var(--green); }
+  .prose hr { border: 0; border-top: 1px dashed var(--border); margin: 2rem 0; }
+
+  .end { margin-top: 4rem; text-align: center; }
+  .end-line { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin-bottom: 1.2rem; }
+  .end p { font-size: 0.78rem; margin-bottom: 1.5rem; }
+  .btn {
+    display: inline-block;
+    font-family: var(--mono);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 7px;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--green); color: var(--green); }
+</style>

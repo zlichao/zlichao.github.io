@@ -1,58 +1,236 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Counter from '../components/Counter.jsx';
+
+const allNotes = await getCollection('notes', ({ data }) => !data.draft);
+const notes = allNotes.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 4);
+
+const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title="Astro + GitHub Pages 模板">
-  <h1>🥟 Astro + GitHub Pages</h1>
-  <p>
-    这是你的最小可运行模板。页面本身是构建时生成的纯 HTML，
-    零 JavaScript —— 除了下面这块 React island。
-  </p>
+<BaseLayout title="Kevin Zhao — 后端/全栈开发者">
 
-  <Counter client:load />
+  <!-- Hero: 终端启动画面 -->
+  <section class="hero">
+    <div class="cmd"><span class="prompt">❯</span> whoami</div>
+    <div class="whoami">
+      <span class="cursor-block">Kevin Zhao</span><span class="caret"></span>
+    </div>
+    <p class="role">
+      <span class="dim">//</span> 后端 / 全栈开发工程师
+      <span class="dim">·</span> 写代码，也写笔记
+    </p>
+    <p class="bio">
+      我沉迷于把复杂的问题拆成清晰的模块——从数据库的索引优化到浏览器的每一帧渲染。
+      这里记录我的技术探索、踩过的坑，以及一点点成长轨迹。
+      <span class="green">欢迎交流 👋</span>
+    </p>
 
-  <h2>为什么选 Astro？</h2>
-  <ul>
-    <li><strong>默认零 JS</strong>：内容站只发 HTML，首屏飞快</li>
-    <li><strong>Islands 架构</strong>：哪块要交互才给哪块注水</li>
-    <li><strong>官方 Action</strong>：push 到 main 自动构建发布</li>
-    <li><strong>不锁生态</strong>：React / Vue / Svelte 组件都能混用</li>
-  </ul>
+    <div class="actions">
+      <a class="btn btn-primary" href={`${import.meta.env.BASE_URL}notes/`}>
+        <span class="prompt">❯</span> 浏览笔记
+      </a>
+      <a class="btn btn-ghost" href={`${import.meta.env.BASE_URL}about/`}>
+        关于我 <span class="dim">↗</span>
+      </a>
+    </div>
+  </section>
 
-  <h2>下一步</h2>
-  <ol>
-    <li>把 <code>astro.config.mjs</code> 里的 site / base 改成你的</li>
-    <li>本地 <code>npm run dev</code> 预览，<code>npm run build</code> 构建</li>
-    <li>推到 GitHub，在 Settings → Pages 里 Source 选 GitHub Actions</li>
-  </ol>
+  <!-- 技能栈 -->
+  <section class="section">
+    <div class="section-title">
+      <span class="green">$</span> cat stack.json
+      <span class="line"></span>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item">
+        <div class="stack-icon">{ }</div>
+        <div><div class="stack-name">Backend</div><div class="stack-desc dim">API · 数据库 · 架构</div></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon">&lt;/&gt;</div>
+        <div><div class="stack-name">Frontend</div><div class="stack-desc dim">React · Astro · UI</div></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon">⚙</div>
+        <div><div class="stack-name">DevOps</div><div class="stack-desc dim">Docker · CI/CD · Cloud</div></div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon">▤</div>
+        <div><div class="stack-name">CS basics</div><div class="stack-desc dim">OS · 网络 · 算法</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 最新笔记 -->
+  <section class="section">
+    <div class="section-title">
+      <span class="green">$</span> ls -lt ./notes | head
+      <span class="line"></span>
+      <a class="all-link dim" href={`${import.meta.env.BASE_URL}notes/`}>view all →</a>
+    </div>
+    <div class="note-list">
+      {notes.map((note) => (
+        <a class="note-row" href={`${import.meta.env.BASE_URL}notes/${note.id}/`}>
+          <div class="note-main">
+            <div class="note-title">{note.data.title}</div>
+            <div class="note-desc dim">{note.data.description}</div>
+            <div class="note-tags">
+              {note.data.tags.slice(0, 3).map((tag) => <span class="tag">#{tag}</span>)}
+            </div>
+          </div>
+          <div class="note-meta dim">
+            <time datetime={note.data.date.toISOString()}>{fmtDate(note.data.date)}</time>
+            <span class="arrow">→</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- 状态栏 -->
+  <div class="status">
+    <span><span class="pulse"></span> currently: building & learning</span>
+    <span class="dim">location: somewhere on Earth · <span class="green">open to connect</span></span>
+  </div>
+
 </BaseLayout>
 
 <style>
-  h2 { margin-top: 2.5rem; font-size: 1.35rem; }
-  li { margin: 0.5rem 0; line-height: 1.6; }
-  code {
-    background: #21262d;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.9em;
+  .hero { padding: 1rem 0 1rem; }
+  .cmd { color: var(--dim); font-size: 0.9rem; margin-bottom: 0.7rem; }
+  .prompt { color: var(--green); }
+  .green { color: var(--green); }
+  .whoami {
+    font-size: clamp(2.2rem, 7vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
   }
-  :global(.counter) {
-    margin: 1.75rem 0;
-    padding: 1.25rem;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-    background: #161b22;
+  .cursor-block {
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
-  :global(.counter p) { margin: 0 0 1rem; color: #8b949e; font-size: 0.9rem; }
-  :global(.counter button) {
-    background: #238636;
-    color: #fff;
-    border: 0;
-    border-radius: 6px;
-    padding: 0.6rem 1.1rem;
-    font-size: 1rem;
-    cursor: pointer;
+  .caret {
+    display: inline-block;
+    width: 14px;
+    height: 0.9em;
+    background: var(--green);
+    margin-left: 6px;
+    vertical-align: -0.08em;
+    animation: blink 1.1s step-end infinite;
   }
-  :global(.counter button:hover) { background: #2ea043; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .role { font-size: 1rem; color: var(--fg); margin: 0 0 1.2rem; }
+  .bio { max-width: 620px; line-height: 1.9; color: var(--dim); font-size: 0.9rem; margin: 0 0 2rem; }
+  .actions { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .btn {
+    text-decoration: none;
+    padding: 0.7rem 1.15rem;
+    border-radius: 7px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: #06120c;
+    font-weight: 600;
+    box-shadow: 0 0 22px rgba(57, 255, 158, 0.18);
+  }
+  .btn-primary .prompt { color: #06120c; }
+  .btn-primary:hover { box-shadow: 0 0 32px rgba(57, 255, 158, 0.35); transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--fg); }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .section { margin-top: 3.5rem; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--fg);
+    margin-bottom: 1.3rem;
+  }
+  .section-title .line { flex: 1; height: 1px; background: var(--border); margin-left: 0.5rem; }
+  .all-link { text-decoration: none; font-size: 0.78rem; }
+  .all-link:hover { color: var(--cyan); }
+
+  .stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+  .stack-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--border);
+    background: rgba(17, 25, 37, 0.6);
+    border-radius: 9px;
+    padding: 1rem 1.1rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .stack-item:hover { border-color: var(--green); transform: translateY(-2px); }
+  .stack-icon {
+    width: 42px; height: 42px;
+    display: grid; place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--green);
+    font-size: 0.95rem;
+    background: var(--bg-soft);
+    flex-shrink: 0;
+  }
+  .stack-name { color: var(--fg-bright); font-size: 0.88rem; font-weight: 600; }
+  .stack-desc { font-size: 0.72rem; margin-top: 0.25rem; }
+
+  .note-list { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: rgba(17,25,37,0.5); }
+  .note-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.15rem 1.3rem;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .note-row:last-child { border-bottom: 0; }
+  .note-row:hover { background: rgba(57, 255, 158, 0.04); }
+  .note-title { color: var(--fg-bright); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .note-row:hover .note-title { color: var(--green); }
+  .note-desc { font-size: 0.78rem; line-height: 1.5; margin-bottom: 0.55rem; }
+  .note-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .tag { font-size: 0.68rem; color: var(--cyan); opacity: 0.85; }
+  .note-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem; font-size: 0.72rem; white-space: nowrap; }
+  .note-meta .arrow { color: var(--dim); font-size: 1rem; transition: transform 0.2s, color 0.2s; }
+  .note-row:hover .note-meta .arrow { color: var(--green); transform: translateX(4px); }
+
+  .status {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    font-size: 0.72rem;
+    color: var(--dim);
+    background: var(--bg-soft);
+    margin-top: 2.5rem;
+  }
+  .pulse {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 0.4rem;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.35; box-shadow: 0 0 2px var(--green); } }
+
+  @media (max-width: 600px) {
+    .stack-grid { grid-template-columns: 1fr; }
+    .note-desc { display: none; }
+  }
 </style>

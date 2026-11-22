@@ -1,6 +1,14 @@
-# Astro + GitHub Pages 模板
+# Kevin Zhao 的个人主页
 
-一个最小可运行的 Astro 静态站点模板，配好了 GitHub Actions 自动部署。
+后端/全栈开发者的个人站，深色极客风，记录成长与技术分享。
+部署在 GitHub Pages：https://zlichao.github.io
+
+## 站点结构
+
+- **首页** `/` — 终端启动画面风格的自我介绍、技能栈、最新笔记
+- **笔记** `/notes/` — 全部技术笔记，支持标签筛选
+- **笔记详情** `/notes/<id>/` — Markdown 渲染、代码高亮样式
+- **关于** `/about/` — 个人介绍、成长时间线、联系方式
 
 ## 本地开发
 
@@ -11,46 +19,50 @@ npm run build     # 构建到 dist/
 npm run preview   # 预览构建产物
 ```
 
-## 部署到 GitHub Pages（当前目标：zlichao.github.io）
+## 怎么加一篇新笔记
 
-本模板已配置好 **用户站点**模式，`site = https://zlichao.github.io`，无 `base`，workflow 监听 `master` 分支（仓库默认分支）。
+在 `src/content/notes/` 下新建一个 `.md` 文件即可，例如 `my-post.md`：
 
-迁移状态（已完成本地部分）：
+```markdown
+---
+title: "文章标题"
+description: "一句话简介，会显示在列表页"
+date: 2026-11-22
+tags: ["标签1", "标签2"]
+category: "技术笔记"
+draft: false
+---
 
-1. ✅ 旧 Jekyll 站点已备份在 `E:\zlichao-github-io-backup`
-2. ✅ 本目录（`E:\zlichao-github-io`）已替换为 Astro 模板，旧 Jekyll 文件已 git rm
-3. ✅ 依赖已安装、构建已验证通过（`npm run build`）
-4. ✅ Git 身份已配置（Kevin-Zhao <zlichao0910@gmail.com>，仅本仓库），commit 已完成：`fd668da 迁移到 Astro`
-5. ⬜ 待操作：在 GitHub 仓库 Settings → Pages → Source 选 **GitHub Actions**
-6. ⬜ 待操作：`git push origin master`，几分钟后 https://zlichao.github.io 上线
-
-### 若换个仓库，配置对照
-
-- 用户站点（仓库名 `<用户名>.github.io`）：`site` 填 `https://<用户名>.github.io`，**删掉 base**，workflow 分支对齐仓库默认分支
-- 项目站点（例如仓库名 `my-blog`）：`site` 填 `https://<用户名>.github.io`，`base` 填 `'/my-blog'`
-- 自定义域名：`site` 填你的域名，删掉 base，并把 `public/CNAME.example` 改名为 `CNAME` 写入域名
-
-## 目录结构
-
+正文写在这里，支持标准 Markdown、代码块、表格。
 ```
-├── .github/workflows/deploy.yml   # 自动构建部署
-├── public/                        # 静态文件原样输出
-├── src/
-│   ├── components/Counter.jsx     # React island 示例
-│   ├── layouts/BaseLayout.astro   # 共享布局
-│   └── pages/                     # 路由页面
-├── astro.config.mjs               # 站点与部署配置
-└── package.json
-```
+
+保存后首页和笔记列表会自动更新。设 `draft: true` 可以隐藏草稿。
+
+## 改成你自己的
+
+用全局搜索替换这些占位内容：
+
+| 位置 | 内容 |
+|------|------|
+| `src/pages/index.astro` | Hero 名字、简介、技能栈卡片 |
+| `src/pages/about.astro` | 成长时间线、联系方式（GitHub / 邮箱） |
+| `src/layouts/BaseLayout.astro` | 站点标题、导航、页脚文案 |
+| `src/content/notes/*.md` | 示例笔记，可直接删掉换成自己的 |
+
+配色调色板在 `src/layouts/BaseLayout.astro` 顶部的 `:root` 里（荧光绿 `--green`、青色 `--cyan` 等）。
 
 ## 技术栈
 
-- Astro 7.4.1（静态输出）
-- React 19（仅 island 部分加载 JS）
-- withastro/action@v6（官方部署 Action）
+- Astro 7.4.1（静态输出，零 JS —— 标签筛选那点脚本是唯一的客户端 JS）
+- Content Collections 管理 Markdown 笔记
+- withastro/action@v6 + GitHub Actions 自动部署
+
+## 部署
+
+已配置好用户站点模式：`site = https://zlichao.github.io`，无 `base`，workflow 监听 `master`。
+push 到 `master` 即自动构建发布（需在仓库 Settings → Pages → Source 选 GitHub Actions）。
 
 ## 注意
 
-- **版本选择**：本地 Node 是 22.22.2，故锁定 Astro 7.4.1 + @astrojs/react 7.1.0（已实测构建通过）。这版 Astro 有一条中危安全公告（动态标签名 XSS / @astrojs/node 图片端点路径问题，GHSA-mh32-jxcr-mh9f），本模板是纯静态输出、不用 @astrojs/node、无动态标签名，不受影响。若本地 Node 升级到 22.23.4+，建议 `npm install astro@latest @astrojs/react@latest` 跟进修复版。
-- GitHub Actions 云端构建默认用 Node 24，不受本地 Node 版本限制。
+- 本地 Node 22.22.2，故锁定 Astro 7.4.1 + @astrojs/react 7.1.0。Astro 7.4.1 有一条中危安全公告（本模板纯静态输出，不受影响）。Node 升级到 22.23.4+ 后可 `npm install astro@latest @astrojs/react@latest`。
 - GitHub Pages 限制：站点 ≤ 1 GB、带宽约 100 GB/月（软限制）、部署超时 10 分钟。

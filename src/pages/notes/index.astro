@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allNotes = await getCollection('notes', ({ data }) => !data.draft);
+const notes = allNotes.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const tagCount = new Map<string, number>();
+notes.forEach((n) => n.data.tags.forEach((t) => tagCount.set(t, (tagCount.get(t) ?? 0) + 1)));
+const tags = [...tagCount.entries()].sort((a, b) => b[1] - a[1]);
+
+const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout title="技术笔记 — Kevin Zhao" description="后端/全栈开发的技术笔记与成长记录">
+
+  <div class="page-head">
+    <div class="cmd"><span class="prompt">❯</span> find ./notes -type f | sort</div>
+    <h1>技术笔记 <span class="count dim">({notes.length})</span></h1>
+    <p class="dim">把学过的、踩过的、想明白的，都写下来。写给未来的自己，也写给刚好路过的你。</p>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter active" data-tag="all">all <span class="dim">({notes.length})</span></button>
+    {tags.map(([tag, count]) => (
+      <button class="filter" data-tag={tag}>#{tag} <span class="dim">({count})</span></button>
+    ))}
+  </div>
+
+  <div class="notes" id="notes">
+    {notes.map((note) => (
+      <article class="note-card" data-tags={note.data.tags.join(',')}>
+        <div class="card-top">
+          <span class="category">{note.data.category}</span>
+          <time class="dim" datetime={note.data.date.toISOString()}>{fmtDate(note.data.date)}</time>
+        </div>
+        <a class="card-title" href={`${import.meta.env.BASE_URL}notes/${note.id}/`}>{note.data.title}</a>
+        <p class="card-desc dim">{note.data.description}</p>
+        <div class="card-tags">
+          {note.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
+          <a class="read dim" href={`${import.meta.env.BASE_URL}notes/${note.id}/`}>read more →</a>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <p class="empty dim" id="empty" hidden>// 这个标签下还没有笔记</p>
+
+  <script>
+    const filters = document.querySelectorAll<HTMLButtonElement>('.filter');
+    const cards = document.querySelectorAll<HTMLElement>('.note-card');
+    const empty = document.getElementById('empty')!;
+
+    filters.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filters.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tag = btn.dataset.tag!;
+        let visible = 0;
+        cards.forEach((card) => {
+          const tags = card.dataset.tags!.split(',');
+          const show = tag === 'all' || tags.includes(tag);
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        empty.hidden = visible !== 0;
+      });
+    });
+  </script>
+
+</BaseLayout>
+
+<style>
+  .page-head { margin-bottom: 2rem; }
+  .cmd { color: var(--dim); font-size: 0.82rem; margin-bottom: 1rem; }
+  .prompt { color: var(--green); }
+  h1 { font-size: 2rem; margin: 0 0 0.6rem; }
+  .count { font-size: 1.2rem; font-weight: 400; }
+  .page-head p { font-size: 0.85rem; line-height: 1.7; margin: 0; }
+
+  .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+  .filter {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-soft);
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter:hover { border-color: var(--cyan); color: var(--cyan); }
+  .filter.active { border-color: var(--green); color: var(--green); background: rgba(57,255,158,0.06); }
+
+  .notes { display: grid; gap: 1rem; }
+  .note-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    background: rgba(17, 25, 37, 0.5);
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  }
+  .note-card:hover { border-color: var(--green); transform: translateY(-2px); background: rgba(17,25,37,0.85); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; margin-bottom: 0.75rem; }
+  .category { color: var(--purple); border: 1px solid rgba(183,140,255,0.3); padding: 0.2rem 0.55rem; border-radius: 4px; }
+  .card-title { font-size: 1.1rem; font-weight: 600; color: var(--fg-bright); text-decoration: none; display: block; margin-bottom: 0.55rem; }
+  .card-title:hover { color: var(--green); }
+  .card-desc { font-size: 0.8rem; line-height: 1.65; margin: 0 0 0.9rem; }
+  .card-tags { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+  .tag { font-size: 0.7rem; color: var(--cyan); opacity: 0.85; }
+  .read { margin-left: auto; font-size: 0.72rem; text-decoration: none; }
+  .read:hover { color: var(--green); }
+  .empty { text-align: center; padding: 3rem; font-size: 0.85rem; }
+</style>

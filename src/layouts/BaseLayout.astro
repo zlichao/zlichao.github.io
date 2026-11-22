@@ -6,8 +6,17 @@ interface Props {
 
 const {
   title,
-  description = '一个用 Astro 搭建、部署在 GitHub Pages 上的静态站点模板',
+  description = 'Kevin Zhao 的个人主页 — 后端/全栈开发，记录成长与技术分享',
 } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname.replace(base, '').replace(/^\//, '');
+
+const navItems = [
+  { label: 'home', href: base, match: '' },
+  { label: 'notes', href: `${base}notes/`, match: 'notes' },
+  { label: 'about', href: `${base}about/`, match: 'about' },
+];
 ---
 
 <!doctype html>
@@ -17,59 +26,179 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0a0e14" />
     <title>{title}</title>
   </head>
   <body>
-    <header>
-      <nav>
-        <a href={import.meta.env.BASE_URL}>首页</a>
-        <a href={`${import.meta.env.BASE_URL}about/`}>关于</a>
-      </nav>
-    </header>
+    <div class="grid-bg" aria-hidden="true"></div>
 
-    <main>
-      <slot />
-    </main>
+    <div class="site">
+      <header>
+        <div class="term-bar">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+          <span class="term-title">kevin@dev:~ — zsh</span>
+        </div>
+        <nav>
+          <a class="brand" href={base}>
+            <span class="prompt">❯</span> kevin<span class="dim">.dev</span>
+          </a>
+          <div class="nav-links">
+            {navItems.map((item) => (
+              <a
+                href={item.href}
+                class={path === item.match || (item.match === '' && path === '') ? 'active' : ''}
+              >
+                <span class="dim">./</span>{item.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      </header>
 
-    <footer>
-      <p>用 Astro 构建 · 部署于 GitHub Pages</p>
-    </footer>
+      <main>
+        <slot />
+      </main>
+
+      <footer>
+        <div class="footer-line">
+          <span><span class="prompt">❯</span> echo "built with Astro + ☕ + GitHub Pages"</span>
+        </div>
+        <p class="dim">© {new Date().getFullYear()} Kevin Zhao · keep building, keep sharing.</p>
+      </footer>
+    </div>
 
     <style is:global>
       :root {
         color-scheme: dark;
-        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-        background: #0e1117;
-        color: #e6edf3;
+        --bg: #0a0e14;
+        --bg-soft: #0f151d;
+        --panel: #111925;
+        --border: #1e2a3a;
+        --fg: #c9d5e3;
+        --fg-bright: #e8f0f8;
+        --dim: #5c6b7f;
+        --green: #39ff9e;
+        --cyan: #4dd8ff;
+        --purple: #b78cff;
+        --amber: #ffb454;
+        --mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+        font-family: var(--mono);
+        background: var(--bg);
+        color: var(--fg);
       }
+
       * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
       body {
         margin: 0;
         min-height: 100vh;
+        background: var(--bg);
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      .grid-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(57, 255, 158, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(57, 255, 158, 0.035) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+      }
+
+      .site {
+        position: relative;
+        z-index: 1;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
         display: flex;
         flex-direction: column;
+        min-height: 100vh;
       }
-      header {
-        border-bottom: 1px solid #30363d;
-        padding: 1rem 1.5rem;
+
+      header { padding-top: 1.5rem; }
+
+      .term-bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 0 0.85rem;
       }
-      nav { display: flex; gap: 1.25rem; }
-      nav a { color: #58a6ff; text-decoration: none; }
-      nav a:hover { text-decoration: underline; }
-      main {
-        flex: 1;
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 3rem 1.5rem;
-        width: 100%;
+      .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+      .dot-r { background: #ff5f56; }
+      .dot-y { background: #ffbd2e; }
+      .dot-g { background: #27c93f; }
+      .term-title { margin-left: 0.6rem; font-size: 0.75rem; color: var(--dim); }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(15, 21, 29, 0.85);
+        backdrop-filter: blur(8px);
+        padding: 0.85rem 1.25rem;
       }
-      h1 { font-size: 2rem; line-height: 1.25; }
+      .brand {
+        color: var(--fg-bright);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: -0.02em;
+      }
+      .brand .prompt { color: var(--green); margin-right: 0.35rem; }
+      .dim { color: var(--dim); }
+      .nav-links { display: flex; gap: 1.5rem; }
+      .nav-links a {
+        color: var(--dim);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover { color: var(--cyan); }
+      .nav-links a.active { color: var(--green); }
+      .nav-links a.active::after {
+        content: ' ▌';
+        animation: blink 1.1s step-end infinite;
+      }
+
+      @keyframes blink { 50% { opacity: 0; } }
+
+      main { flex: 1; padding: 3.5rem 0 4rem; }
+
+      h1, h2, h3 { color: var(--fg-bright); font-weight: 600; letter-spacing: -0.02em; }
+      h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.2; }
+      h2 { font-size: 1.35rem; }
+      a { color: var(--cyan); }
+
+      ::selection { background: rgba(57, 255, 158, 0.25); color: #fff; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: var(--bg); }
+      ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+
       footer {
-        border-top: 1px solid #30363d;
-        padding: 1.25rem 1.5rem;
-        text-align: center;
-        color: #8b949e;
-        font-size: 0.875rem;
+        border-top: 1px solid var(--border);
+        padding: 1.75rem 0 2.5rem;
+        font-size: 0.8rem;
+      }
+      .footer-line { color: var(--dim); margin-bottom: 0.6rem; }
+      .footer-line .prompt { color: var(--green); }
+      footer p { margin: 0; }
+
+      @media (max-width: 600px) {
+        .nav-links { gap: 1rem; }
+        .term-title { display: none; }
       }
     </style>
   </body>
